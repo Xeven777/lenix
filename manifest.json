@@ -14,5 +14,8 @@
       "js": ["lenis.min.js", "content.js"],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "icons": {
+    "128": "lenix.png"
+  }
 }

@@ -1,6 +1,6 @@
 // Default settings
 const defaultSettings = {
-    enabled: true,
+    enabled: false,
     duration: 1.2,
     direction: 'vertical',
     smooth: true,
@@ -30,7 +30,6 @@ async function saveSettings(settings) {
     });
 }
 
-// Detect scroll libraries on the page
 async function detectScrollLibs() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -38,13 +37,15 @@ async function detectScrollLibs() {
         chrome.tabs.sendMessage(tab.id, {
             type: 'DETECT_LIBS'
         }, (response) => {
+            if (chrome.runtime.lastError) {
+                resolve({ detected: [], hasAny: false });
+                return;
+            }
             if (response && response.detected) {
                 resolve(response);
             } else {
                 resolve({ detected: [], hasAny: false });
             }
-        }).catch(() => {
-            resolve({ detected: [], hasAny: false });
         });
     });
 }
@@ -205,14 +206,15 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     window.close();
 });
 
-// Notify content script of changes
 async function notifyContentScript(settings) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.tabs.sendMessage(tab.id, {
         type: 'UPDATE_LENIS',
         settings: settings
-    }).catch(() => {
-        // Content script not loaded yet
+    }, (response) => {
+        if (chrome.runtime.lastError) {
+            return;
+        }
     });
 }
 
