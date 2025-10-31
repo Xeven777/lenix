@@ -1,5 +1,6 @@
 let lenisInstance = null;
 let animationId = null;
+let scrollbarStyleElement = null;
 
 // Detect scroll libraries already on the page
 function detectScrollLibraries() {
@@ -43,7 +44,6 @@ function getEasingFunction(type) {
     return easings[type] || easings.expo;
 }
 
-// Get settings from Chrome storage
 function getSettings() {
     return new Promise((resolve) => {
         chrome.storage.sync.get({
@@ -56,14 +56,42 @@ function getSettings() {
             smoothTouch: true,
             wheelMultiplier: 1,
             easing: 'expo',
-            ignoreSelectors: ''
+            ignoreSelectors: '',
+            infinite: false,
+            hideScrollbar: false
         }, resolve);
     });
 }
 
 // Initialize or reinitialize Lenis
+function toggleScrollbarVisibility(hide) {
+    if (hide) {
+        if (!scrollbarStyleElement) {
+            scrollbarStyleElement = document.createElement('style');
+            scrollbarStyleElement.id = 'lenis-scrollbar-hide';
+            scrollbarStyleElement.textContent = `
+                ::-webkit-scrollbar {
+                    display: none !important;
+                }
+                * {
+                    -ms-overflow-style: none !important;
+                    scrollbar-width: none !important;
+                }
+            `;
+            document.head.appendChild(scrollbarStyleElement);
+        }
+    } else {
+        if (scrollbarStyleElement) {
+            scrollbarStyleElement.remove();
+            scrollbarStyleElement = null;
+        }
+    }
+}
+
 async function initLenis() {
     const settings = await getSettings();
+
+    toggleScrollbarVisibility(settings.hideScrollbar);
 
     if (!settings.enabled) {
         if (lenisInstance) {
@@ -76,7 +104,6 @@ async function initLenis() {
         return;
     }
 
-    // Lenis is already loaded via manifest.json
     if (window.Lenis) {
         createLenisInstance(settings);
     } else {
@@ -86,7 +113,6 @@ async function initLenis() {
 
 // Create or recreate Lenis instance
 async function createLenisInstance(settings) {
-    // Destroy previous instance if it exists
     if (lenisInstance) {
         lenisInstance.destroy?.();
         if (animationId) {
@@ -108,10 +134,10 @@ async function createLenisInstance(settings) {
         touchMultiplier: settings.touchMultiplier,
         wheelMultiplier: settings.wheelMultiplier,
         lerp: settings.lerp ? 0.1 : 0,
+        infinite: settings.infinite,
         ignore: ignoredElements,
     });
 
-    // Create animation loop
     function raf(time) {
         lenisInstance.raf(time);
         animationId = requestAnimationFrame(raf);

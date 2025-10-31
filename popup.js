@@ -9,7 +9,44 @@ const defaultSettings = {
     smoothTouch: true,
     wheelMultiplier: 1,
     easing: 'expo',
-    ignoreSelectors: ''
+    ignoreSelectors: '',
+    infinite: false,
+    hideScrollbar: false
+};
+
+const presets = {
+    balanced: {
+        duration: 1.2,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        easing: 'expo',
+        lerp: true,
+        smooth: true
+    },
+    ultraSmooth: {
+        duration: 2.5,
+        wheelMultiplier: 0.8,
+        touchMultiplier: 1.5,
+        easing: 'sine',
+        lerp: true,
+        smooth: true
+    },
+    snappy: {
+        duration: 0.6,
+        wheelMultiplier: 1.5,
+        touchMultiplier: 2.5,
+        easing: 'quad',
+        lerp: true,
+        smooth: true
+    },
+    cinematic: {
+        duration: 3,
+        wheelMultiplier: 0.5,
+        touchMultiplier: 1,
+        easing: 'cubic',
+        lerp: true,
+        smooth: true
+    }
 };
 
 // Load settings from Chrome storage
@@ -20,6 +57,8 @@ async function loadSettings() {
         });
     });
 }
+
+let currentPreset = 'custom';
 
 // Save settings to Chrome storage
 async function saveSettings(settings) {
@@ -87,6 +126,9 @@ async function updateUI() {
     document.getElementById('wheelValue').textContent = settings.wheelMultiplier.toFixed(1) + 'x';
     document.getElementById('easingSelect').value = settings.easing;
     document.getElementById('ignoreInput').value = settings.ignoreSelectors;
+    document.getElementById('infiniteToggle').classList.toggle('active', settings.infinite);
+    document.getElementById('hideScrollbarToggle').classList.toggle('active', settings.hideScrollbar);
+    document.getElementById('presetsSelect').value = currentPreset;
 
     const statusEl = document.getElementById('status');
     if (settings.enabled) {
@@ -103,6 +145,7 @@ document.getElementById('toggleLenis').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.enabled = !settings.enabled;
     await saveSettings(settings);
+    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -112,6 +155,7 @@ document.getElementById('directionSelect').addEventListener('change', async (e) 
     const settings = await loadSettings();
     settings.direction = e.target.value;
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -120,6 +164,7 @@ document.getElementById('smoothToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.smooth = !settings.smooth;
     await saveSettings(settings);
+    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -129,6 +174,7 @@ document.getElementById('lerpToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.lerp = !settings.lerp;
     await saveSettings(settings);
+    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -138,6 +184,7 @@ document.getElementById('smoothTouchToggle').addEventListener('click', async () 
     const settings = await loadSettings();
     settings.smoothTouch = !settings.smoothTouch;
     await saveSettings(settings);
+    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -151,6 +198,7 @@ document.getElementById('durationSlider').addEventListener('change', async (e) =
     const settings = await loadSettings();
     settings.duration = parseFloat(e.target.value);
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -163,6 +211,7 @@ document.getElementById('touchSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.touchMultiplier = parseFloat(e.target.value);
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -175,6 +224,7 @@ document.getElementById('wheelSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.wheelMultiplier = parseFloat(e.target.value);
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -183,6 +233,7 @@ document.getElementById('easingSelect').addEventListener('change', async (e) => 
     const settings = await loadSettings();
     settings.easing = e.target.value;
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -191,10 +242,47 @@ document.getElementById('ignoreInput').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.ignoreSelectors = e.target.value;
     await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
-// Reset to defaults
+document.getElementById('infiniteToggle').addEventListener('click', async () => {
+    const settings = await loadSettings();
+    settings.infinite = !settings.infinite;
+    await saveSettings(settings);
+    currentPreset = 'custom';
+    updateUI();
+    notifyContentScript(settings);
+});
+
+document.getElementById('hideScrollbarToggle').addEventListener('click', async () => {
+    const settings = await loadSettings();
+    settings.hideScrollbar = !settings.hideScrollbar;
+    await saveSettings(settings);
+    currentPreset = 'custom';
+    updateUI();
+    notifyContentScript(settings);
+});
+
+document.getElementById('presetsSelect').addEventListener('change', async (e) => {
+    if (e.target.value === 'custom') return;
+
+    currentPreset = e.target.value;
+    const settings = await loadSettings();
+    const preset = presets[e.target.value];
+
+    Object.assign(settings, preset);
+    await saveSettings(settings);
+
+    const controlsContainer = document.querySelector('.controls');
+    controlsContainer.querySelectorAll('.control-group').forEach(group => {
+        group.classList.add('preset-highlight');
+        setTimeout(() => group.classList.remove('preset-highlight'), 600);
+    });
+
+    updateUI();
+    notifyContentScript(settings);
+});// Reset to defaults
 document.getElementById('resetBtn').addEventListener('click', async () => {
     await saveSettings(defaultSettings);
     updateUI();
@@ -218,6 +306,4 @@ async function notifyContentScript(settings) {
     });
 }
 
-// Initialize UI and detect libs on popup open
 updateUI();
-updateDetection();
