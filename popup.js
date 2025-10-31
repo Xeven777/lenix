@@ -5,10 +5,14 @@ const defaultSettings = {
     direction: 'vertical',
     smooth: true,
     lerp: true,
+    lerpValue: 0.1,
     touchMultiplier: 2,
     smoothTouch: true,
     wheelMultiplier: 1,
     easing: 'expo',
+    easingPower: 10,
+    easingAmplitude: 1,
+    easingPeriod: 0.3,
     ignoreSelectors: '',
     infinite: false,
     hideScrollbar: false
@@ -81,30 +85,34 @@ const presets = {
     }
 };
 
-const easingFunctions = {
-    expo: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    sine: (t) => Math.sin((t * Math.PI) / 2),
-    quad: (t) => t * t,
-    cubic: (t) => t * t * t,
-    linear: (t) => t,
-    bounce: (t) => {
-        const n1 = 7.5625;
-        const d1 = 2.75;
-        if (t < 1 / d1) {
-            return n1 * t * t;
-        } else if (t < 2 / d1) {
-            return n1 * (t -= 1.5 / d1) * t + 0.75;
-        } else if (t < 2.5 / d1) {
-            return n1 * (t -= 2.25 / d1) * t + 0.9375;
-        } else {
-            return n1 * (t -= 2.625 / d1) * t + 0.984375;
+function getEasingFunctions(power = 10, amplitude = 1, period = 0.3) {
+    return {
+        expo: (t) => Math.min(1, 1.001 - Math.pow(2, -power * t)),
+        sine: (t) => Math.sin((t * Math.PI) / 2),
+        quad: (t) => Math.pow(t, 2),
+        cubic: (t) => Math.pow(t, 3),
+        quart: (t) => Math.pow(t, 4),
+        quint: (t) => Math.pow(t, 5),
+        linear: (t) => t,
+        bounce: (t) => {
+            const n1 = 7.5625;
+            const d1 = 2.75;
+            if (t < 1 / d1) {
+                return n1 * t * t;
+            } else if (t < 2 / d1) {
+                return n1 * (t -= 1.5 / d1) * t + 0.75;
+            } else if (t < 2.5 / d1) {
+                return n1 * (t -= 2.25 / d1) * t + 0.9375;
+            } else {
+                return n1 * (t -= 2.625 / d1) * t + 0.984375;
+            }
+        },
+        elastic: (t) => {
+            if (t === 0 || t === 1) return t;
+            return amplitude * Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / period)) + 1;
         }
-    },
-    elastic: (t) => {
-        if (t === 0 || t === 1) return t;
-        return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
-    }
-};
+    };
+}
 
 // Load settings from Chrome storage
 async function loadSettings() {
@@ -125,25 +133,56 @@ async function saveSettings(settings) {
     });
 }
 
-function drawEasingCurve(easingType) {
+function updateEasingParamVisibility(easingType) {
+    const powerGroup = document.getElementById('easingPowerGroup');
+    const amplitudeGroup = document.getElementById('easingAmplitudeGroup');
+    const periodGroup = document.getElementById('easingPeriodGroup');
+
+    powerGroup.style.display = 'none';
+    amplitudeGroup.style.display = 'none';
+    periodGroup.style.display = 'none';
+
+    if (easingType === 'expo') {
+        powerGroup.style.display = 'block';
+    } else if (easingType === 'elastic') {
+        amplitudeGroup.style.display = 'block';
+        periodGroup.style.display = 'block';
+    }
+}
+
+async function drawEasingCurve(easingType) {
     const canvas = document.getElementById('easingCanvas');
     if (!canvas) return;
 
+    const settings = await loadSettings();
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
 
     ctx.clearRect(0, 0, width, height);
 
-    ctx.strokeStyle = 'rgba(255, 158, 204, 0.2)';
+    ctx.strokeStyle = 'rgba(255, 158, 204, 0.1)';
     ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, height);
-    ctx.lineTo(0, 0);
-    ctx.moveTo(0, height);
-    ctx.lineTo(width, height);
-    ctx.stroke();
+    for (let i = 0; i <= 4; i++) {
+        const y = (height / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+    }
+    for (let i = 0; i <= 4; i++) {
+        const x = (width / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+    }
 
+    const easingFunctions = getEasingFunctions(
+        settings.easingPower,
+        settings.easingAmplitude,
+        settings.easingPeriod
+    );
     const easingFunc = easingFunctions[easingType] || easingFunctions.expo;
 
     ctx.beginPath();
@@ -233,6 +272,16 @@ async function updateUI() {
     document.getElementById('hideScrollbarToggle').classList.toggle('active', settings.hideScrollbar);
     document.getElementById('presetsSelect').value = currentPreset;
 
+    document.getElementById('lerpSlider').value = settings.lerpValue;
+    document.getElementById('lerpSliderValue').textContent = settings.lerpValue.toFixed(2);
+    document.getElementById('easingPowerSlider').value = settings.easingPower;
+    document.getElementById('easingPowerValue').textContent = settings.easingPower.toFixed(1);
+    document.getElementById('easingAmplitudeSlider').value = settings.easingAmplitude;
+    document.getElementById('easingAmplitudeValue').textContent = settings.easingAmplitude.toFixed(1);
+    document.getElementById('easingPeriodSlider').value = settings.easingPeriod;
+    document.getElementById('easingPeriodValue').textContent = settings.easingPeriod.toFixed(2);
+
+    updateEasingParamVisibility(settings.easing);
     drawEasingCurve(settings.easing);
 
     const statusEl = document.getElementById('status');
@@ -339,7 +388,59 @@ document.getElementById('easingSelect').addEventListener('change', async (e) => 
     settings.easing = e.target.value;
     await saveSettings(settings);
     currentPreset = 'custom';
+    updateEasingParamVisibility(e.target.value);
     drawEasingCurve(e.target.value);
+    notifyContentScript(settings);
+});
+
+document.getElementById('lerpSlider').addEventListener('input', (e) => {
+    document.getElementById('lerpSliderValue').textContent = parseFloat(e.target.value).toFixed(2);
+});
+
+document.getElementById('lerpSlider').addEventListener('change', async (e) => {
+    const settings = await loadSettings();
+    settings.lerpValue = parseFloat(e.target.value);
+    await saveSettings(settings);
+    currentPreset = 'custom';
+    notifyContentScript(settings);
+});
+
+document.getElementById('easingPowerSlider').addEventListener('input', (e) => {
+    document.getElementById('easingPowerValue').textContent = parseFloat(e.target.value).toFixed(1);
+    drawEasingCurve(document.getElementById('easingSelect').value);
+});
+
+document.getElementById('easingPowerSlider').addEventListener('change', async (e) => {
+    const settings = await loadSettings();
+    settings.easingPower = parseFloat(e.target.value);
+    await saveSettings(settings);
+    currentPreset = 'custom';
+    notifyContentScript(settings);
+});
+
+document.getElementById('easingAmplitudeSlider').addEventListener('input', (e) => {
+    document.getElementById('easingAmplitudeValue').textContent = parseFloat(e.target.value).toFixed(1);
+    drawEasingCurve(document.getElementById('easingSelect').value);
+});
+
+document.getElementById('easingAmplitudeSlider').addEventListener('change', async (e) => {
+    const settings = await loadSettings();
+    settings.easingAmplitude = parseFloat(e.target.value);
+    await saveSettings(settings);
+    currentPreset = 'custom';
+    notifyContentScript(settings);
+});
+
+document.getElementById('easingPeriodSlider').addEventListener('input', (e) => {
+    document.getElementById('easingPeriodValue').textContent = parseFloat(e.target.value).toFixed(2);
+    drawEasingCurve(document.getElementById('easingSelect').value);
+});
+
+document.getElementById('easingPeriodSlider').addEventListener('change', async (e) => {
+    const settings = await loadSettings();
+    settings.easingPeriod = parseFloat(e.target.value);
+    await saveSettings(settings);
+    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 

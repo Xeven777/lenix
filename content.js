@@ -30,13 +30,14 @@ function detectScrollLibraries() {
     return detected;
 }
 
-// Get easing function based on setting
-function getEasingFunction(type) {
+function getEasingFunction(type, power = 10, amplitude = 1, period = 0.3) {
     const easings = {
-        expo: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        expo: (t) => Math.min(1, 1.001 - Math.pow(2, -power * t)),
         sine: (t) => Math.sin((t * Math.PI) / 2),
-        quad: (t) => t * t,
-        cubic: (t) => t * t * t,
+        quad: (t) => Math.pow(t, 2),
+        cubic: (t) => Math.pow(t, 3),
+        quart: (t) => Math.pow(t, 4),
+        quint: (t) => Math.pow(t, 5),
         linear: (t) => t,
         bounce: (t) => {
             const n1 = 7.5625;
@@ -53,7 +54,7 @@ function getEasingFunction(type) {
         },
         elastic: (t) => {
             if (t === 0 || t === 1) return t;
-            return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+            return amplitude * Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / period)) + 1;
         }
     };
     return easings[type] || easings.expo;
@@ -67,10 +68,14 @@ function getSettings() {
             direction: 'vertical',
             smooth: true,
             lerp: true,
+            lerpValue: 0.1,
             touchMultiplier: 2,
             smoothTouch: true,
             wheelMultiplier: 1,
             easing: 'expo',
+            easingPower: 10,
+            easingAmplitude: 1,
+            easingPeriod: 0.3,
             ignoreSelectors: '',
             infinite: false,
             hideScrollbar: false
@@ -141,14 +146,19 @@ async function createLenisInstance(settings) {
 
     lenisInstance = new window.Lenis({
         duration: settings.duration,
-        easing: getEasingFunction(settings.easing),
+        easing: getEasingFunction(
+            settings.easing,
+            settings.easingPower,
+            settings.easingAmplitude,
+            settings.easingPeriod
+        ),
         direction: settings.direction,
         gestureDirection: settings.direction,
         smooth: settings.smooth,
         smoothTouch: settings.smoothTouch,
         touchMultiplier: settings.touchMultiplier,
         wheelMultiplier: settings.wheelMultiplier,
-        lerp: settings.lerp ? 0.1 : 0,
+        lerp: settings.lerp ? settings.lerpValue : 0,
         infinite: settings.infinite,
         ignore: ignoredElements,
     });

@@ -511,10 +511,12 @@
                         <span class="control-label">Easing Function</span>
                     </div>
                     <select class="select" id="easingSelect">
-                        <option value="expo">Exponential (default)</option>
+                        <option value="expo">Exponential</option>
                         <option value="sine">Sine</option>
                         <option value="quad">Quadratic</option>
                         <option value="cubic">Cubic</option>
+                        <option value="quart">Quartic</option>
+                        <option value="quint">Quintic</option>
                         <option value="linear">Linear</option>
                         <option value="bounce">Bounce</option>
                         <option value="elastic">Elastic</option>
@@ -522,6 +524,45 @@
                     <div class="easing-preview">
                         <canvas id="easingCanvas" width="350" height="80"></canvas>
                     </div>
+                    <div class="slider-label">Visual curve preview</div>
+                </div>
+
+                <div class="control-group" id="easingPowerGroup" style="display: none;">
+                    <div class="control-header">
+                        <span class="control-label">Expo Power</span>
+                        <span class="slider-value" id="easingPowerValue">10.0</span>
+                    </div>
+                    <input type="range" class="slider" id="easingPowerSlider" min="1" max="20" step="0.5" value="10">
+                    <div class="slider-label">Exponential curve strength</div>
+                </div>
+
+                <div class="control-group" id="easingAmplitudeGroup" style="display: none;">
+                    <div class="control-header">
+                        <span class="control-label">Amplitude</span>
+                        <span class="slider-value" id="easingAmplitudeValue">1.0</span>
+                    </div>
+                    <input type="range" class="slider" id="easingAmplitudeSlider" min="0.5" max="2" step="0.1"
+                        value="1">
+                    <div class="slider-label">Elastic bounce strength</div>
+                </div>
+
+                <div class="control-group" id="easingPeriodGroup" style="display: none;">
+                    <div class="control-header">
+                        <span class="control-label">Period</span>
+                        <span class="slider-value" id="easingPeriodValue">0.30</span>
+                    </div>
+                    <input type="range" class="slider" id="easingPeriodSlider" min="0.1" max="1" step="0.05"
+                        value="0.3">
+                    <div class="slider-label">Elastic oscillation frequency</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Lerp Value</span>
+                        <span class="slider-value" id="lerpSliderValue">0.10</span>
+                    </div>
+                    <input type="range" class="slider" id="lerpSlider" min="0.01" max="0.5" step="0.01" value="0.1">
+                    <div class="slider-label">Interpolation smoothness (when enabled)</div>
                 </div>
 
                 <div class="control-group">
