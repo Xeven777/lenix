@@ -15,7 +15,9 @@ const defaultSettings = {
     easingPeriod: 0.3,
     ignoreSelectors: '',
     infinite: false,
-    hideScrollbar: false
+    hideScrollbar: false,
+    currentPreset: 'custom',
+    blacklistedSites: []
 };
 
 const presets = {
@@ -122,8 +124,6 @@ async function loadSettings() {
         });
     });
 }
-
-let currentPreset = 'custom';
 
 async function saveSettings(settings) {
     return new Promise((resolve) => {
@@ -270,7 +270,10 @@ async function updateUI() {
     document.getElementById('ignoreInput').value = settings.ignoreSelectors;
     document.getElementById('infiniteToggle').classList.toggle('active', settings.infinite);
     document.getElementById('hideScrollbarToggle').classList.toggle('active', settings.hideScrollbar);
-    document.getElementById('presetsSelect').value = currentPreset;
+    document.getElementById('presetsSelect').value = settings.currentPreset || 'custom';
+    document.getElementById('blacklistTextarea').value = (settings.blacklistedSites || []).join('\n');
+
+    await checkIfCurrentSiteBlacklisted();
 
     document.getElementById('lerpSlider').value = settings.lerpValue;
     document.getElementById('lerpSliderValue').textContent = settings.lerpValue.toFixed(2);
@@ -298,8 +301,8 @@ async function updateUI() {
 document.getElementById('toggleLenis').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.enabled = !settings.enabled;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -308,8 +311,8 @@ document.getElementById('toggleLenis').addEventListener('click', async () => {
 document.getElementById('directionSelect').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.direction = e.target.value;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -317,8 +320,8 @@ document.getElementById('directionSelect').addEventListener('change', async (e) 
 document.getElementById('smoothToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.smooth = !settings.smooth;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -327,8 +330,8 @@ document.getElementById('smoothToggle').addEventListener('click', async () => {
 document.getElementById('lerpToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.lerp = !settings.lerp;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -337,8 +340,8 @@ document.getElementById('lerpToggle').addEventListener('click', async () => {
 document.getElementById('smoothTouchToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.smoothTouch = !settings.smoothTouch;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -351,8 +354,8 @@ document.getElementById('durationSlider').addEventListener('input', (e) => {
 document.getElementById('durationSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.duration = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -364,8 +367,8 @@ document.getElementById('touchSlider').addEventListener('input', (e) => {
 document.getElementById('touchSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.touchMultiplier = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -377,8 +380,8 @@ document.getElementById('wheelSlider').addEventListener('input', (e) => {
 document.getElementById('wheelSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.wheelMultiplier = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -386,8 +389,8 @@ document.getElementById('wheelSlider').addEventListener('change', async (e) => {
 document.getElementById('easingSelect').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.easing = e.target.value;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateEasingParamVisibility(e.target.value);
     drawEasingCurve(e.target.value);
     notifyContentScript(settings);
@@ -400,8 +403,8 @@ document.getElementById('lerpSlider').addEventListener('input', (e) => {
 document.getElementById('lerpSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.lerpValue = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -413,8 +416,8 @@ document.getElementById('easingPowerSlider').addEventListener('input', (e) => {
 document.getElementById('easingPowerSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.easingPower = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -426,8 +429,8 @@ document.getElementById('easingAmplitudeSlider').addEventListener('input', (e) =
 document.getElementById('easingAmplitudeSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.easingAmplitude = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -439,8 +442,8 @@ document.getElementById('easingPeriodSlider').addEventListener('input', (e) => {
 document.getElementById('easingPeriodSlider').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.easingPeriod = parseFloat(e.target.value);
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
@@ -448,16 +451,16 @@ document.getElementById('easingPeriodSlider').addEventListener('change', async (
 document.getElementById('ignoreInput').addEventListener('change', async (e) => {
     const settings = await loadSettings();
     settings.ignoreSelectors = e.target.value;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     notifyContentScript(settings);
 });
 
 document.getElementById('infiniteToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.infinite = !settings.infinite;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -465,8 +468,8 @@ document.getElementById('infiniteToggle').addEventListener('click', async () => 
 document.getElementById('hideScrollbarToggle').addEventListener('click', async () => {
     const settings = await loadSettings();
     settings.hideScrollbar = !settings.hideScrollbar;
+    settings.currentPreset = 'custom';
     await saveSettings(settings);
-    currentPreset = 'custom';
     updateUI();
     notifyContentScript(settings);
 });
@@ -474,11 +477,11 @@ document.getElementById('hideScrollbarToggle').addEventListener('click', async (
 document.getElementById('presetsSelect').addEventListener('change', async (e) => {
     if (e.target.value === 'custom') return;
 
-    currentPreset = e.target.value;
     const settings = await loadSettings();
     const preset = presets[e.target.value];
 
     Object.assign(settings, preset);
+    settings.currentPreset = e.target.value;
     await saveSettings(settings);
 
     const controlsContainer = document.querySelector('.controls');
@@ -495,6 +498,90 @@ document.getElementById('resetBtn').addEventListener('click', async () => {
     updateUI();
     notifyContentScript(defaultSettings);
 });
+
+document.getElementById('blacklistTextarea').addEventListener('change', async (e) => {
+    const settings = await loadSettings();
+    const lines = e.target.value.split('\n').map(line => line.trim()).filter(line => line);
+    settings.blacklistedSites = lines;
+    settings.currentPreset = 'custom';
+    await saveSettings(settings);
+    notifyContentScript(settings);
+    checkIfCurrentSiteBlacklisted();
+});
+
+document.getElementById('addCurrentSiteBtn').addEventListener('click', async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const url = new URL(tab.url);
+    const hostname = url.hostname;
+
+    const settings = await loadSettings();
+    if (!settings.blacklistedSites) settings.blacklistedSites = [];
+
+    if (!settings.blacklistedSites.includes(hostname)) {
+        settings.blacklistedSites.push(hostname);
+        settings.currentPreset = 'custom';
+        await saveSettings(settings);
+        updateUI();
+        notifyContentScript(settings);
+    }
+});
+
+document.getElementById('removeCurrentSiteBtn').addEventListener('click', async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const url = new URL(tab.url);
+    const hostname = url.hostname;
+
+    const settings = await loadSettings();
+    if (!settings.blacklistedSites) settings.blacklistedSites = [];
+
+    settings.blacklistedSites = settings.blacklistedSites.filter(site => site !== hostname);
+    settings.currentPreset = 'custom';
+    await saveSettings(settings);
+    updateUI();
+    notifyContentScript(settings);
+});
+
+async function checkIfCurrentSiteBlacklisted() {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || !tab.url) return;
+
+    const url = new URL(tab.url);
+    const hostname = url.hostname;
+
+    const settings = await loadSettings();
+    const blacklist = settings.blacklistedSites || [];
+
+    const isBlacklisted = blacklist.some(pattern => {
+        const trimmedPattern = pattern.trim().toLowerCase();
+        if (!trimmedPattern) return false;
+
+        if (trimmedPattern.includes('*')) {
+            const regexPattern = trimmedPattern
+                .replace(/\./g, '\\.')
+                .replace(/\*/g, '.*');
+            const regex = new RegExp(`^${regexPattern}$`, 'i');
+            return regex.test(hostname);
+        }
+
+        return hostname.includes(trimmedPattern);
+    });
+
+    const currentSiteStatus = document.getElementById('currentSiteStatus');
+    const addBtn = document.getElementById('addCurrentSiteBtn');
+    const removeBtn = document.getElementById('removeCurrentSiteBtn');
+
+    if (isBlacklisted) {
+        currentSiteStatus.textContent = `🚫 Current site (${hostname}) is blacklisted`;
+        currentSiteStatus.style.color = '#ff9ecc';
+        addBtn.disabled = true;
+        removeBtn.disabled = false;
+    } else {
+        currentSiteStatus.textContent = `✓ Current site (${hostname}) is active`;
+        currentSiteStatus.style.color = '#888';
+        addBtn.disabled = false;
+        removeBtn.disabled = true;
+    }
+}
 
 // Save button (just closes popup)
 document.getElementById('saveBtn').addEventListener('click', () => {

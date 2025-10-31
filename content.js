@@ -78,8 +78,30 @@ function getSettings() {
             easingPeriod: 0.3,
             ignoreSelectors: '',
             infinite: false,
-            hideScrollbar: false
+            hideScrollbar: false,
+            blacklistedSites: []
         }, resolve);
+    });
+}
+
+function isCurrentSiteBlacklisted(blacklist) {
+    if (!blacklist || blacklist.length === 0) return false;
+
+    const currentUrl = window.location.hostname;
+
+    return blacklist.some(pattern => {
+        const trimmedPattern = pattern.trim().toLowerCase();
+        if (!trimmedPattern) return false;
+
+        if (trimmedPattern.includes('*')) {
+            const regexPattern = trimmedPattern
+                .replace(/\./g, '\\.')
+                .replace(/\*/g, '.*');
+            const regex = new RegExp(`^${regexPattern}$`, 'i');
+            return regex.test(currentUrl);
+        }
+
+        return currentUrl.includes(trimmedPattern);
     });
 }
 
@@ -112,6 +134,18 @@ async function initLenis() {
     const settings = await getSettings();
 
     toggleScrollbarVisibility(settings.hideScrollbar);
+
+    if (isCurrentSiteBlacklisted(settings.blacklistedSites)) {
+        console.log('🚫 Lenix: Site is blacklisted, skipping initialization');
+        if (lenisInstance) {
+            lenisInstance.destroy?.();
+            lenisInstance = null;
+        }
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        return;
+    }
 
     if (!settings.enabled) {
         if (lenisInstance) {

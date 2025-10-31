@@ -21,11 +21,15 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
 
 - **Duration Control** - Adjust scroll animation speed (0.2s - 3s)
 - **Direction Toggle** - Switch between vertical and horizontal scrolling
-- **Easing Functions** - Choose from 5 easing types (Exponential, Sine, Quad, Cubic, Linear)
+- **Easing Functions** - Choose from 9 easing types (Exponential, Sine, Quad, Cubic, Bounce, Elastic, etc.)
 - **Wheel Multiplier** - Fine-tune mouse wheel sensitivity (0.1x - 3x)
 - **Touch Multiplier** - Control mobile touch sensitivity (0.5x - 5x)
 - **Smooth/Lerp Toggle** - Advanced interpolation settings
 - **Ignore Selectors** - Exclude specific elements from smooth scrolling
+- **Website Blacklist** - Disable smooth scrolling on specific domains
+- **Quick Presets** - 8 pre-configured scroll profiles (Balanced, Ultra Smooth, Snappy, Cinematic, etc.)
+- **Hide Scrollbar** - Option to hide the webpage scrollbar
+- **Infinite Scroll** - Circular loop scrolling mode
 
 ### Smart Detection
 
@@ -114,8 +118,10 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
 | Setting              | Range         | Default     | Description                        |
 | -------------------- | ------------- | ----------- | ---------------------------------- |
 | **Wheel Multiplier** | 0.1x - 3x     | 1x          | Mouse wheel sensitivity            |
-| **Easing Function**  | 5 types       | Exponential | Scroll acceleration curve          |
+| **Easing Function**  | 9 types       | Exponential | Scroll acceleration curve          |
 | **Ignore Selectors** | CSS selectors | Empty       | Elements to exclude from smoothing |
+| **Infinite Scroll**  | Toggle        | Off         | Circular loop scrolling            |
+| **Hide Scrollbar**   | Toggle        | Off         | Hide webpage scrollbar             |
 
 ### Easing Functions Explained
 
@@ -123,7 +129,24 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
 - **Sine** - Gentle easing in and out
 - **Quadratic** - Subtle acceleration
 - **Cubic** - Stronger acceleration curve
+- **Quartic** - Even stronger acceleration
+- **Quintic** - Maximum acceleration
 - **Linear** - Constant speed (no easing)
+- **Bounce** - Bouncy playful effect
+- **Elastic** - Elastic spring-like motion
+
+### Quick Presets
+
+Choose from 8 pre-configured profiles for instant customization:
+
+- **⚖️ Balanced** - Default smooth experience
+- **🌊 Ultra Smooth** - Extra slow and silky
+- **⚡ Snappy** - Fast and responsive
+- **🎬 Cinematic** - Dramatic, slow motion
+- **🏀 Bounce** - Playful bouncy scrolling
+- **🎪 Elastic** - Spring-loaded feel
+- **⚡️ Lightning** - Instant, no delay
+- **🧈 Butter** - Maximum smoothness
 
 ### Ignoring Elements
 
@@ -134,6 +157,40 @@ Skip smooth scrolling on specific page elements using CSS selectors:
 ```
 
 Multiple selectors separated by commas work too!
+
+### Website Blacklist
+
+Disable smooth scrolling on specific websites permanently:
+
+#### How to Use
+
+1. **Manual Entry** - Type domains in the textarea, one per line
+2. **Quick Add** - Use "+ Add Current" button to blacklist the current site
+3. **Quick Remove** - Use "− Remove Current" button to remove current site from blacklist
+
+#### Examples
+
+```
+example.com
+youtube.com
+github.com
+```
+
+#### Wildcard Support
+
+Use `*` for pattern matching:
+
+```
+*.google.com       # Blocks all Google subdomains
+mail.*.com         # Blocks mail on any .com domain
+```
+
+#### When to Use
+
+- Sites with existing smooth scroll implementations
+- Sites where smooth scrolling causes performance issues
+- Sites where you prefer native scrolling
+- Banking/financial sites for maximum responsiveness
 
 ---
 
@@ -208,10 +265,11 @@ The extension features a modern, tech-forward design inspired by cutting-edge we
 ### Smooth scrolling isn't working
 
 1. Ensure the extension is **enabled** in the popup
-2. Check if the page has **conflicting scroll libraries** (green indicator)
-3. Try **disabling conflicting libraries** in browser DevTools
-4. **Refresh the page** after making changes
-5. **Reset settings** to defaults and try again
+2. Check if the site is **blacklisted** (check Website Blacklist section)
+3. Check if the page has **conflicting scroll libraries** (green indicator)
+4. Try **disabling conflicting libraries** in browser DevTools
+5. **Refresh the page** after making changes
+6. **Reset settings** to defaults and try again
 
 ### Scrolling feels janky
 
@@ -294,9 +352,10 @@ lenis-extension/
 ### For Developers
 
 - Use **Ignore Selectors** to exclude UI elements that shouldn't smooth scroll
+- Use **Website Blacklist** to permanently disable on sites with conflicts
 - Test different **Easing Functions** to match your site's aesthetic
 - Combine with **Direction** toggle for creative scroll experiences
-- **Disable on conflicting sites** for best results
+- Wildcard patterns in blacklist let you block entire subdomains
 
 ### For Power Users
 

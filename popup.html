@@ -419,6 +419,71 @@
             height: 80px;
             display: block;
         }
+
+        .textarea-box {
+            background: rgba(255, 158, 204, 0.05);
+            border: 1px solid rgba(255, 158, 204, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            width: 100%;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .textarea-box:focus {
+            outline: none;
+            background: rgba(255, 158, 204, 0.1);
+            border-color: rgba(255, 158, 204, 0.4);
+        }
+
+        .textarea-box::placeholder {
+            color: #666;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 158, 204, 0.3);
+            border-radius: 6px;
+            background: rgba(255, 158, 204, 0.05);
+            color: #ff9ecc;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-small:hover:not(:disabled) {
+            background: rgba(255, 158, 204, 0.15);
+            border-color: rgba(255, 158, 204, 0.5);
+        }
+
+        .btn-small:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .current-site-status {
+            font-size: 10px;
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 158, 204, 0.1);
+        }
     </style>
 </head>
 
@@ -597,6 +662,30 @@
                         <button class="toggle-switch" id="hideScrollbarToggle"></button>
                     </div>
                     <div class="slider-label">Hide webpage scrollbar</div>
+                </div>
+            </div>
+
+            <!-- Blacklist Section -->
+            <div>
+                <div class="section-title">// Website Blacklist</div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Blacklisted Sites</span>
+                    </div>
+                    <textarea class="textarea-box" id="blacklistTextarea"
+                        placeholder="example.com&#10;*.google.com&#10;youtube.com"
+                        title="One domain per line. Use * for wildcards"></textarea>
+                    <div class="slider-label">One domain per line (supports wildcards like *.example.com)</div>
+
+                    <div class="current-site-status" id="currentSiteStatus">
+                        Checking current site...
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-small" id="addCurrentSiteBtn">+ Add Current</button>
+                        <button class="btn-small" id="removeCurrentSiteBtn">− Remove Current</button>
+                    </div>
                 </div>
             </div>
 
