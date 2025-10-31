@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenis Control</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 420px;
+            max-height: 90vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1515 100%);
+            font-family: 'JetBrains Mono', monospace;
+            color: #fff;
+            overflow-y: auto;
+        }
+
+        body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        body::-webkit-scrollbar-track {
+            background: #1a1515;
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background: rgba(255, 158, 204, 0.5);
+            border-radius: 3px;
+        }
+
+        .container {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            margin-bottom: 8px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .detection-box {
+            background: rgba(255, 158, 204, 0.05);
+            border: 1px solid rgba(255, 158, 204, 0.15);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .detection-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .detection-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detection-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .detection-indicator.detected {
+            background: #ffb3d9;
+            box-shadow: 0 0 8px rgba(255, 179, 217, 0.6);
+        }
+
+        .detection-indicator.none {
+            background: #666;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .detection-text {
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .detection-libs {
+            font-size: 11px;
+            color: #ff9ecc;
+            margin-top: 8px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .control-group {
+            background: rgba(255, 158, 204, 0.05);
+            border: 1px solid rgba(255, 158, 204, 0.15);
+            border-radius: 10px;
+            padding: 14px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            background: rgba(255, 158, 204, 0.08);
+            border-color: rgba(255, 158, 204, 0.25);
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 158, 204, 0.2);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 10px;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(90deg, rgba(255, 158, 204, 0.3), rgba(255, 158, 204, 0.6));
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 158, 204, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 158, 204, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        .slider-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff9ecc;
+            min-width: 35px;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slider-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .select {
+            background: rgba(255, 158, 204, 0.1);
+            border: 1px solid rgba(255, 158, 204, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            padding: 8px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select:hover {
+            background: rgba(255, 158, 204, 0.15);
+            border-color: rgba(255, 158, 204, 0.3);
+        }
+
+        .select option {
+            background: #1a1515;
+            color: #fff;
+        }
+
+        .footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 158, 204, 0.1);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 158, 204, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 158, 204, 0.05);
+            color: #ff9ecc;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn:hover {
+            background: rgba(255, 158, 204, 0.15);
+            border-color: rgba(255, 158, 204, 0.5);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
+            color: #000;
+            border: none;
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #ffb0d9 0%, #ffc0e0 100%);
+        }
+
+        .status {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status.active {
+            color: #ff9ecc;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .row-2 .control-group {
+            padding: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">> LENIS</div>
+            <div class="subtitle">smooth scroll lib</div>
+        </div>
+
+        <!-- Detection Box -->
+        <div class="detection-box">
+            <div class="detection-label">Scroll Library Detection</div>
+            <div class="detection-content">
+                <div class="detection-indicator detected" id="indicator"></div>
+                <div class="detection-text" id="detectionText">Scanning...</div>
+            </div>
+            <div class="detection-libs" id="detectedLibs"></div>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-header">
+                    <span class="control-label">Enable Lenis</span>
+                    <button class="toggle-switch active" id="toggleLenis"></button>
+                </div>
+                <div class="status active" id="status">✓ active</div>
+            </div>
+
+            <!-- Core Settings Section -->
+            <div>
+                <div class="section-title">// Core Settings</div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Duration</span>
+                        <span class="slider-value" id="durationValue">1.2s</span>
+                    </div>
+                    <input type="range" class="slider" id="durationSlider" min="0.2" max="3" step="0.1" value="1.2">
+                    <div class="slider-label">Animation speed</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Direction</span>
+                    </div>
+                    <select class="select" id="directionSelect">
+                        <option value="vertical">Vertical</option>
+                        <option value="horizontal">Horizontal</option>
+                    </select>
+                </div>
+
+                <div class="row-2">
+                    <div class="control-group">
+                        <div class="control-header">
+                            <span class="control-label">Smooth</span>
+                            <button class="toggle-switch active" id="smoothToggle"></button>
+                        </div>
+                        <div class="slider-label">Smooth scrolling</div>
+                    </div>
+                    <div class="control-group">
+                        <div class="control-header">
+                            <span class="control-label">Lerp</span>
+                            <button class="toggle-switch active" id="lerpToggle"></button>
+                        </div>
+                        <div class="slider-label">Linear interpolation</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Touch Settings Section -->
+            <div>
+                <div class="section-title">// Touch & Mobile</div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Touch Multiplier</span>
+                        <span class="slider-value" id="touchValue">2x</span>
+                    </div>
+                    <input type="range" class="slider" id="touchSlider" min="0.5" max="5" step="0.5" value="2">
+                    <div class="slider-label">Mobile sensitivity</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Smooth Touch</span>
+                        <button class="toggle-switch active" id="smoothTouchToggle"></button>
+                    </div>
+                    <div class="slider-label">Enable on touch devices</div>
+                </div>
+            </div>
+
+            <!-- Advanced Settings Section -->
+            <div>
+                <div class="section-title">// Advanced</div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Easing Function</span>
+                    </div>
+                    <select class="select" id="easingSelect">
+                        <option value="expo">Exponential (default)</option>
+                        <option value="sine">Sine</option>
+                        <option value="quad">Quadratic</option>
+                        <option value="cubic">Cubic</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Wheel Multiplier</span>
+                        <span class="slider-value" id="wheelValue">1x</span>
+                    </div>
+                    <input type="range" class="slider" id="wheelSlider" min="0.1" max="3" step="0.1" value="1">
+                    <div class="slider-label">Mouse wheel sensitivity</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Ignore Scroll</span>
+                    </div>
+                    <input type="text" class="select" id="ignoreInput" placeholder="e.g., .menu, #sidebar"
+                        title="CSS selectors to ignore">
+                    <div class="slider-label">Selectors to skip (comma-separated)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <button class="btn" id="resetBtn">Reset</button>
+            <button class="btn primary" id="saveBtn">Apply</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
