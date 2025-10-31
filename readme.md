@@ -41,9 +41,6 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
   - SimpleBar
   - Custom implementations
   - Framework-specific handlers (Next.js, Nuxt, etc.)
-- ⚠️ **Conflict Warnings** - Visual indicator when other scroll libs are detected
-- 📊 **Live Status** - Real-time library scan in the popup
-
 ---
 
 ## 📦 Installation
@@ -54,7 +51,7 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
 
    ```bash
    git clone <repository-url>
-   cd lenis-extension
+   cd lenix
    ```
 
 2. **Prepare the files** - Ensure you have these 4 files in the extension folder:
@@ -90,7 +87,7 @@ A sleek, modern Chrome extension that adds buttery-smooth scrolling to **any web
 
 ### Quick Start
 
-1. Click the **LENIS** extension icon in your Chrome toolbar
+1. Click the **LENIX** extension icon in your Chrome toolbar
 2. Toggle the **"Enable Lenis"** switch to activate smooth scrolling
 3. Customize settings as desired
 4. Click **"Apply"** to save changes
@@ -210,13 +207,6 @@ The extension automatically scans each page for existing smooth scroll libraries
 - ✅ Custom scroll implementations
 - ✅ Framework handlers (Next.js, Nuxt)
 
-### Detection UI
-
-- 🟢 **Green indicator** - Scroll library detected (might conflict)
-- ⚫ **Gray indicator** - No scroll libraries found
-
-**Tip:** If a library is detected, you may want to disable Lenis to avoid conflicts with the page's existing implementation.
-
 ---
 
 ## ⚙️ Settings Storage
@@ -297,7 +287,7 @@ The extension features a modern, tech-forward design inspired by cutting-edge we
 ## 📝 File Structure
 
 ```
-lenis-extension/
+lenix/
 ├── manifest.json      # Extension configuration & permissions
 ├── content.js         # Page injection & Lenis initialization
 ├── popup.html         # Extension popup UI (HTML + CSS)
