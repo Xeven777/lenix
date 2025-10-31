@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenis Control</title>
+    <title>LeniX Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bokor&display=swap" rel="stylesheet">
     <link
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet">
@@ -17,8 +20,7 @@
 
         body {
             width: 420px;
-            max-height: 90vh;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1515 100%);
+            background: linear-gradient(130deg, #0a0a0a 0%, #1a1515 50%, #0a0a0a 100%);
             font-family: 'JetBrains Mono', monospace;
             color: #fff;
             overflow-y: auto;
@@ -46,17 +48,15 @@
 
         .header {
             margin-bottom: 8px;
+            text-align: center;
         }
 
         .title {
-            font-size: 32px;
+            font-size: 40px;
             font-weight: 800;
-            background: linear-gradient(135deg, #ff9ecc 0%, #ffb3d9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -2px;
-            font-family: 'Space Mono', monospace;
+            color: #ffb3d9;
+            letter-spacing: 4px;
+            font-family: 'Bokor', monospace;
         }
 
         .subtitle {
@@ -224,6 +224,7 @@
             background: linear-gradient(90deg, rgba(255, 158, 204, 0.3), rgba(255, 158, 204, 0.6));
             border-radius: 3px;
             outline: none;
+            width: 100%;
             cursor: pointer;
         }
 
@@ -484,28 +485,6 @@
                 </div>
             </div>
 
-            <!-- Touch Settings Section -->
-            <div>
-                <div class="section-title">// Touch & Mobile</div>
-
-                <div class="control-group">
-                    <div class="control-header">
-                        <span class="control-label">Touch Multiplier</span>
-                        <span class="slider-value" id="touchValue">2x</span>
-                    </div>
-                    <input type="range" class="slider" id="touchSlider" min="0.5" max="5" step="0.5" value="2">
-                    <div class="slider-label">Mobile sensitivity</div>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-header">
-                        <span class="control-label">Smooth Touch</span>
-                        <button class="toggle-switch active" id="smoothTouchToggle"></button>
-                    </div>
-                    <div class="slider-label">Enable on touch devices</div>
-                </div>
-            </div>
-
             <!-- Advanced Settings Section -->
             <div>
                 <div class="section-title">// Advanced</div>
@@ -555,6 +534,28 @@
                         <button class="toggle-switch" id="hideScrollbarToggle"></button>
                     </div>
                     <div class="slider-label">Hide webpage scrollbar</div>
+                </div>
+            </div>
+
+            <!-- Touch Settings Section -->
+            <div>
+                <div class="section-title">// Touch & Mobile</div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Touch Multiplier</span>
+                        <span class="slider-value" id="touchValue">2x</span>
+                    </div>
+                    <input type="range" class="slider" id="touchSlider" min="0.5" max="5" step="0.5" value="2">
+                    <div class="slider-label">Mobile sensitivity</div>
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Smooth Touch</span>
+                        <button class="toggle-switch active" id="smoothTouchToggle"></button>
+                    </div>
+                    <div class="slider-label">Enable on touch devices</div>
                 </div>
             </div>
         </div>
