@@ -46,6 +46,63 @@ const presets = {
         easing: 'cubic',
         lerp: true,
         smooth: true
+    },
+    bounce: {
+        duration: 1.8,
+        wheelMultiplier: 1.2,
+        touchMultiplier: 2,
+        easing: 'bounce',
+        lerp: true,
+        smooth: true
+    },
+    elastic: {
+        duration: 2,
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.8,
+        easing: 'elastic',
+        lerp: true,
+        smooth: true
+    },
+    lightning: {
+        duration: 0.3,
+        wheelMultiplier: 2,
+        touchMultiplier: 3,
+        easing: 'linear',
+        lerp: false,
+        smooth: true
+    },
+    butter: {
+        duration: 2.8,
+        wheelMultiplier: 0.6,
+        touchMultiplier: 1.2,
+        easing: 'sine',
+        lerp: true,
+        smooth: true
+    }
+};
+
+const easingFunctions = {
+    expo: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    sine: (t) => Math.sin((t * Math.PI) / 2),
+    quad: (t) => t * t,
+    cubic: (t) => t * t * t,
+    linear: (t) => t,
+    bounce: (t) => {
+        const n1 = 7.5625;
+        const d1 = 2.75;
+        if (t < 1 / d1) {
+            return n1 * t * t;
+        } else if (t < 2 / d1) {
+            return n1 * (t -= 1.5 / d1) * t + 0.75;
+        } else if (t < 2.5 / d1) {
+            return n1 * (t -= 2.25 / d1) * t + 0.9375;
+        } else {
+            return n1 * (t -= 2.625 / d1) * t + 0.984375;
+        }
+    },
+    elastic: (t) => {
+        if (t === 0 || t === 1) return t;
+        return Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * ((2 * Math.PI) / 3)) + 1;
     }
 };
 
@@ -60,13 +117,59 @@ async function loadSettings() {
 
 let currentPreset = 'custom';
 
-// Save settings to Chrome storage
 async function saveSettings(settings) {
     return new Promise((resolve) => {
         chrome.storage.sync.set(settings, () => {
             resolve();
         });
     });
+}
+
+function drawEasingCurve(easingType) {
+    const canvas = document.getElementById('easingCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    ctx.strokeStyle = 'rgba(255, 158, 204, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, height);
+    ctx.lineTo(0, 0);
+    ctx.moveTo(0, height);
+    ctx.lineTo(width, height);
+    ctx.stroke();
+
+    const easingFunc = easingFunctions[easingType] || easingFunctions.expo;
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#ff9ecc';
+    ctx.lineWidth = 2;
+
+    for (let x = 0; x <= width; x++) {
+        const t = x / width;
+        const y = height - (easingFunc(t) * height);
+
+        if (x === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffb3d9';
+    ctx.beginPath();
+    ctx.arc(0, height, 4, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(width, 0, 4, 0, 2 * Math.PI);
+    ctx.fill();
 }
 
 async function detectScrollLibs() {
@@ -129,6 +232,8 @@ async function updateUI() {
     document.getElementById('infiniteToggle').classList.toggle('active', settings.infinite);
     document.getElementById('hideScrollbarToggle').classList.toggle('active', settings.hideScrollbar);
     document.getElementById('presetsSelect').value = currentPreset;
+
+    drawEasingCurve(settings.easing);
 
     const statusEl = document.getElementById('status');
     if (settings.enabled) {
@@ -234,6 +339,7 @@ document.getElementById('easingSelect').addEventListener('change', async (e) => 
     settings.easing = e.target.value;
     await saveSettings(settings);
     currentPreset = 'custom';
+    drawEasingCurve(e.target.value);
     notifyContentScript(settings);
 });
 

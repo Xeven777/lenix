@@ -7,9 +7,8 @@
     <title>LeniX Control</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bokor&display=swap" rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Mono:wght@400;700&family=Bokor&display=swap"
         rel="stylesheet">
     <style>
         * {
@@ -406,14 +405,28 @@
         .input-box::placeholder {
             color: #666;
         }
+
+        .easing-preview {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 158, 204, 0.1);
+        }
+
+        #easingCanvas {
+            width: 100%;
+            height: 80px;
+            display: block;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <div class="title">> LENIS</div>
-            <div class="subtitle">smooth scroll lib</div>
+            <div class="title">> LENIX</div>
+            <div class="subtitle">smoothest scroll is here</div>
         </div>
 
         <!-- Main Controls -->
@@ -439,6 +452,10 @@
                         <option value="ultraSmooth">🌊 Ultra Smooth</option>
                         <option value="snappy">⚡ Snappy</option>
                         <option value="cinematic">🎬 Cinematic</option>
+                        <option value="bounce">🏀 Bounce</option>
+                        <option value="elastic">🎪 Elastic</option>
+                        <option value="lightning">⚡️ Lightning</option>
+                        <option value="butter">🧈 Butter</option>
                     </select>
                     <div class="slider-label">Quick configuration templates</div>
                 </div>
@@ -499,7 +516,12 @@
                         <option value="quad">Quadratic</option>
                         <option value="cubic">Cubic</option>
                         <option value="linear">Linear</option>
+                        <option value="bounce">Bounce</option>
+                        <option value="elastic">Elastic</option>
                     </select>
+                    <div class="easing-preview">
+                        <canvas id="easingCanvas" width="350" height="80"></canvas>
+                    </div>
                 </div>
 
                 <div class="control-group">
